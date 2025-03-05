@@ -5,7 +5,9 @@ def main():
     with open("day4/input.txt", "r") as file:
         for line in file.readlines():
             matrix.append(list(line.strip('\n')))
-    return word_search(matrix)
+    print(matrix)
+    #return word_search(matrix)
+    return day4part2(matrix)
 
 def horizontal(line):
     tmp = "".join(line)
@@ -69,4 +71,19 @@ def word_search(matrix):
     word_count += diagonal(matrix)
     return word_count
 
+def day4part2(matrix):
+    count = 0
+    surroundings = []
+    for i in range(1, len(matrix)-1, 1):
+        for j in range(1, len(matrix)-1, 1):
+            if matrix[i][j] == 'A':
+                surroundings = []
+                surroundings.append([matrix[i-1][j-1],
+                                     matrix[i+1][j-1],
+                                     matrix[i+1][j+1],
+                                     matrix[i-1][j+1]])
+                if 'M' in surroundings[0] and 'S' in surroundings[0] and len(set(surroundings[0]))==2:
+                    if (matrix[i-1][j-1] != matrix [i+1][j+1]) and (matrix[i+1][j-1] != matrix [i-1][j+1]):
+                        count += 1
+    return count
 print(main())
