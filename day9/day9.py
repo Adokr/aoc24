@@ -39,10 +39,66 @@ def compress(disk):
         compressedDisk.append(".")
     return compressedDisk
 
-def checksum(disk):
-    return sum([int(disk[i]) * i for i in range(len(disk) - disk.count('.'))])
+def findLeftmostFreeSpace(disk, size, fileID):
+    freeSpaceID = None
+    freeSpaceSize = 0
+    freeSpaceCount = 0
+    fileCount = 0
+    freeSpaceSeenAlready = False
+    fileSeenAlready = False
 
+    for i in range(len(disk)):
+        if i >= fileID:
+            break
+
+        if disk[i] == '.' and not freeSpaceSeenAlready:
+            freeSpaceCount += 1
+            freeSpaceSeenAlready = True
+            fileSeenAlready = False
+            for j in range(i, len(disk)):
+                if disk[j] == ".":
+                    freeSpaceSize += 1
+                else:
+                    break
+            if freeSpaceSize >= size:
+                freeSpaceID = i
+                break
+
+        elif disk[i] != '.' and not fileSeenAlready:
+            fileCount += 1
+            freeSpaceSeenAlready = False
+            fileSeenAlready = True
+        freeSpaceSize = 0
+    return freeSpaceID
+
+def getFileID(disk, file):
+    for i in range(len(disk)):
+        if disk[i] == file:
+            return i
+    return None
+
+def moveFiles(disk):
+    alreadyMoved = set([])
+    for i in range(int(max(disk)), 0, -1):
+        print(i)
+        fileToMove = i
+        if fileToMove not in alreadyMoved:
+            fileID = getFileID(disk, str(fileToMove))
+            fileToMoveSize = disk.count(str(i))
+            freeSpaceID = findLeftmostFreeSpace(disk, fileToMoveSize, fileID)
+            if  freeSpaceID is not None:
+                disk[freeSpaceID:(freeSpaceID+fileToMoveSize)] = [str(fileToMove)]*fileToMoveSize
+                disk[fileID:fileToMoveSize+fileID] = ['.']*fileToMoveSize
+        alreadyMoved.add(fileToMove)
+    return disk        
+
+def checksum(disk):
+    result = 0
+    for i in range(len(disk)):
+        if disk[i] != '.':
+            result += i*int(disk[i])
+    return result
 def main():
     data = getData("day9/input.txt")
-    print(checksum(compress(transformToDotsAndIDs(data[0]))))
+    print(checksum(moveFiles(transformToDotsAndIDs(data[0]))))
 main()
