@@ -100,5 +100,5 @@ def checksum(disk):
     return result
 def main():
     data = getData("day9/input.txt")
-    print(checksum(moveFiles(transformToDotsAndIDs(data[0]))))
+    
 main()
